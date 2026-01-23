@@ -4,5 +4,8 @@ export const API_ENDPOINTS = {
   REGISTER: 'auth/register',
   LOGIN: 'auth/login',
   LOGOUT_USER: 'users/logout',
-  USER_PROFILE: 'auth/myProfile'
+  USER_PROFILE: 'auth/myProfile',
+
+  // jobs
+  JOBS : 'jobs'
 };

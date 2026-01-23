@@ -95,6 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoggedIn(false);
   };
 
+
   return (
     <AuthContext.Provider
       value={{

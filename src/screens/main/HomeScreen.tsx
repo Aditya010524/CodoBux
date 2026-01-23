@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,110 +10,127 @@ import {
   FlatList,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import JobCard, { JobData } from '../../components/JobCard'; 
 import { useUserStore } from '../../store/auth_store';
+import { useJobStore } from '../../store/job_store';
+import JobCard from '../../components/JobCard';
 
-// --- Mock Data ---
-const JOBS_DATA: JobData[] = [
-  {
-    id: '1',
-    title: 'Kitchen Renovation',
-    client: 'Sarah Johnson',
-    price: '$45,000',
-    location: 'San Francisco',
-    date: 'Started Dec 15, 2024',
-    status: 'Active',
-  },
-  {
-    id: '2',
-    title: 'Bathroom Remodel',
-    client: 'Michael Chen',
-    price: '$28,000',
-    location: 'Oakland',
-    date: 'Started Jan 5, 2025',
-    status: 'Pending',
-  },
-  {
-    id: '3',
-    title: 'Deck Construction',
-    client: 'Emily Rodriguez',
-    price: '$15,000',
-    location: 'Berkeley',
-    date: 'Started Nov 1, 2024',
-    status: 'Completed',
-  },
-];
+const HomeScreen = ({ navigation }: any) => {
+  const user = useUserStore(state => state.user);
+  const jobs = useJobStore(state => state.jobs);
 
-const HomeScreen = ({navigation} : any) => {
-const user = useUserStore(state => state.user);
+  useEffect(() => {
+    console.log('📦 LOCAL JOBS:', jobs);
+  }, [jobs]);
 
+  const renderItem = ({ item }: any) => {
+    const formattedItem = {
+      id: item.id,
+      title: item.title,
+      client: item.client || 'No Client',
+      location: item.location || 'Remote',
+      price: item.budget ? `$${item.budget.toLocaleString()}` : '$0',
+      date: new Date(parseInt(item.id)).toLocaleDateString(),
+      status: 'Pending' as const,
+    };
 
-  const renderItem = ({ item }: { item: JobData }) => (
-    <JobCard item={item} onPress={() => console.log('Clicked', item.title)} />
+    return (
+      <View style={{ marginBottom: 12 }}>
+        <JobCard
+          item={formattedItem}
+          onPress={() =>
+            navigation.navigate('JobDetailsScreen', { jobId: item.id })
+          }
+        />
+      </View>
+    );
+  };
+
+  const renderEmptyState = () => (
+    <View style={styles.emptyState}>
+      <View style={styles.emptyIconContainer}>
+        <Ionicons name="documents-outline" size={48} color="#CBD5E1" />
+      </View>
+      <Text style={styles.emptyTitle}>No Jobs Found</Text>
+      <Text style={styles.emptyText}>
+        You haven't added any jobs yet.{'\n'}Tap the + button to get started.
+      </Text>
+    </View>
   );
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-      
-      <View style={styles.container}>
-        
-        {/* --- Header --- */}
+      <StatusBar barStyle="dark-content" backgroundColor="#EDF4FF" />
+
+      {/* --- Top Section (White Background) --- */}
+      <View style={styles.topContainer}>
+        {/* Header */}
         <View style={styles.header}>
           <View>
             <Text style={styles.welcomeText}>Welcome back,</Text>
-            <Text style={styles.userName}>{user?.name}</Text>
+            <Text style={styles.userName}>{user?.name || 'User'}</Text>
           </View>
-          {/* Avatar Circle */}
-          <TouchableOpacity onPress={()=>navigation.navigate("ProfileScreen")} style={styles.avatar}>
-            <Text style={styles.avatarText}>{user?.name?.charAt(0).toUpperCase()}</Text>
+
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ProfileScreen')}
+            style={styles.avatar}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.avatarText}>
+              {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </Text>
           </TouchableOpacity>
         </View>
 
-        {/* --- Search Bar --- */}
+        {/* Search */}
         <View style={styles.searchContainer}>
-          <Ionicons name="search-outline" size={20} color="#94A3B8" style={{ marginRight: 10 }} />
-          <TextInput 
-            placeholder="Search jobs..." 
+          <Ionicons name="search-outline" size={20} color="#94A3B8" style={{ marginRight: 8 }} />
+          <TextInput
+            placeholder="Search jobs..."
             placeholderTextColor="#94A3B8"
             style={styles.searchInput}
           />
         </View>
+      </View>
 
-        {/* --- List Section Header --- */}
+      {/* --- Bottom Section (Blue Background) --- */}
+      <View style={styles.contentContainer}>
+        {/* Section Header */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Your Jobs ({JOBS_DATA.length})</Text>
-          <TouchableOpacity>
+          <Text style={styles.sectionTitle}>Your Jobs ({jobs.length})</Text>
+          <TouchableOpacity activeOpacity={0.7}>
             <Text style={styles.viewAllText}>View All</Text>
           </TouchableOpacity>
         </View>
 
-        {/* --- Jobs List --- */}
+        {/* Job List */}
         <FlatList
-          data={JOBS_DATA}
+          data={jobs}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
+          ListEmptyComponent={renderEmptyState}
         />
 
-        {/* --- Floating Action Button (FAB) --- */}
-        <TouchableOpacity style={styles.fab} activeOpacity={0.8}
-        onPress={()=>navigation.navigate("CreateJobScreen")}>
-          <Ionicons name="add" size={32} color="#FFFFFF" />
-        </TouchableOpacity>
-
-        {/* --- "Back Online" Toast (Absolute Positioned) --- */}
-        <View style={styles.toastContainer}>
-          <View style={styles.toastIcon}>
-            <Ionicons name="wifi" size={18} color="#16A34A" />
+        {/* Back Online Banner */}
+        <View style={styles.onlineBanner}>
+          <View style={styles.onlineIconCircle}>
+            <Ionicons name="wifi" size={20} color="#22C55E" />
           </View>
           <View>
-            <Text style={styles.toastTitle}>Back Online</Text>
-            <Text style={styles.toastSubtitle}>All changes synced</Text>
+             <Text style={styles.onlineTitle}>Back Online</Text>
+             <Text style={styles.onlineSubtitle}>All changes synced</Text>
           </View>
         </View>
 
+        {/* FAB */}
+        <TouchableOpacity
+          style={styles.fab}
+          activeOpacity={0.9}
+          onPress={() => navigation.navigate('CreateJobScreen')}
+        >
+          <Ionicons name="add" size={32} color="#FFFFFF" />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -122,15 +139,18 @@ const user = useUserStore(state => state.user);
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8FAFC', // Very light gray/blue bg
+    backgroundColor: '#FFFFFF', // Top safe area is white now
   },
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
+  // --- Top Section Styles ---
+  topContainer: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
     paddingTop: 16,
+    paddingBottom: 8,
+    borderBottomLeftRadius: 24, // Optional: Adds a subtle curve at transition
+    borderBottomRightRadius: 24, // Optional
+    zIndex: 10,
   },
-
-  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -140,36 +160,41 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 14,
     color: '#64748B',
+    fontWeight: '500',
     marginBottom: 2,
   },
   userName: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontSize: 28,
+    fontWeight: '800',
     color: '#0F172A',
   },
   avatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#4F8EF7',
+    backgroundColor: '#3B82F6',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   avatarText: {
     color: '#FFFFFF',
     fontSize: 20,
     fontWeight: '700',
   },
-
-  // Search Bar
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F5F9', // Slightly darker than bg
-    borderRadius: 16,
+    backgroundColor: '#F1F5F9', // Light Grey Background
+    borderRadius: 25,
     height: 52,
-    paddingHorizontal: 16,
-    marginBottom: 24,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    // Removed border for cleaner look, added subtle inner feel
   },
   searchInput: {
     flex: 1,
@@ -178,7 +203,13 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 
-  // Section Header
+  // --- Bottom Section Styles ---
+  contentContainer: {
+    flex: 1,
+    backgroundColor: '#EDF4FF', // Light blue background
+    paddingHorizontal: 20,
+    paddingTop: 24,
+  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -192,19 +223,81 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: 14,
-    color: '#3B82F6', // Blue Link
     fontWeight: '600',
+    color: '#3B82F6',
+  },
+  listContent: {
+    paddingBottom: 140,
+  },
+  
+  // Empty State
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 60,
+  },
+  emptyIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFFFFF', // White circle on blue bg
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginBottom: 8,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 20,
   },
 
-  // List
-  listContent: {
-    paddingBottom: 100, // Space for FAB and Toast
+  // Online Banner
+  onlineBanner: {
+    position: 'absolute',
+    bottom: 24,
+    left: 20,
+    right: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#64748B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  onlineIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#DCFCE7',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  onlineTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  onlineSubtitle: {
+    fontSize: 12,
+    color: '#64748B',
   },
 
   // FAB
   fab: {
     position: 'absolute',
-    bottom: 100, // Above the toast
+    bottom: 100,
     right: 24,
     width: 56,
     height: 56,
@@ -212,49 +305,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#3B82F6',
     justifyContent: 'center',
     alignItems: 'center',
-    // Shadow
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
     elevation: 8,
-  },
-
-  // Toast
-  toastContainer: {
-    position: 'absolute',
-    bottom: 24,
-    left: 24,
-    right: 24,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    // Shadow
-    shadowColor: '#64748B',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  toastIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F0FDF4',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  toastTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  toastSubtitle: {
-    fontSize: 12,
-    color: '#64748B',
   },
 });
 

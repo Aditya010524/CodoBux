@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -13,42 +13,68 @@ import {
   Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Button from '../../components/Button'; 
+import Button from '../../components/Button';
 import { useJobStore } from '../../store/job_store';
 
-const CreateJobScreen = ({ navigation }: any) => {
-  const addJob = useJobStore((state) => state.addJob);
+const EditJobScreen = ({ route, navigation }: any) => {
+  // 1. Get the Job ID passed from the previous screen
+  const { jobId } = route.params;
+  
+  // 2. Access store functions
+  const jobToEdit = useJobStore((state) => state.jobs.find((j) => j.id === jobId));
+  const updateJob = useJobStore((state) => state.updateJob);
+
   const [isLoading, setIsLoading] = useState(false);
+  
+  // State variables
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [client, setClient] = useState('');
   const [city, setCity] = useState('');
   const [budget, setBudget] = useState('');
 
+  // 3. Pre-fill data when screen loads
+  useEffect(() => {
+    if (jobToEdit) {
+      setTitle(jobToEdit.title);
+      setDescription(jobToEdit.description);
+      setClient(jobToEdit.client);
+      setCity(jobToEdit.location);
+      setBudget(jobToEdit.budget.toString());
+    }
+  }, [jobToEdit]);
+
   const handleBack = () => navigation.goBack();
 
-  const handleCreateJob = async () => {
+  const handleUpdateJob = async () => {
     if (!title || !budget) {
       Alert.alert('Validation Error', 'Please fill in title and budget');
       return;
     }
+
+    const budgetNumber = parseFloat(budget);
+    if (isNaN(budgetNumber) || budgetNumber <= 0) {
+      Alert.alert('Validation Error', 'Please enter a valid budget');
+      return;
+    }
+
     setIsLoading(true);
-    const newJob = {
-      id: Date.now().toString(),
-      title,
-      description,
-      client,
-      location: city,
-      budget: budget,
-    };
 
     try {
-      addJob(newJob);
-      console.log("✅ Job added:", newJob);
-      navigation.goBack();   
+      // 4. Call Update instead of Add
+      updateJob(jobId, {
+        title,
+        description,
+        client,
+        location: city,
+        budget: budgetNumber,
+      });
+
+      console.log("✅ Job updated successfully");
+      navigation.goBack();
     } catch (e) {
-      console.error('Create job error:', e);
-      Alert.alert('Error', 'Failed to save job');
+      console.error('Update job error:', e);
+      Alert.alert('Error', 'Failed to update job');
     } finally {
       setIsLoading(false);
     }
@@ -65,6 +91,8 @@ const CreateJobScreen = ({ navigation }: any) => {
       <Text style={styles.sectionTitle}>{title}</Text>
     </View>
   );
+
+  if (!jobToEdit) return null; // Safety check
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -84,9 +112,10 @@ const CreateJobScreen = ({ navigation }: any) => {
               <Ionicons name="arrow-back" color="#0F172A" size={24} />
             </TouchableOpacity>
             <View style={{ marginLeft: 16, flex: 1 }}>
-              <Text style={styles.pageTitle}>Create New Job</Text>
+              {/* Changed Title to 'Edit Job' */}
+              <Text style={styles.pageTitle}>Edit Job</Text>
               <View style={styles.subtitleRow}>
-                <Text style={styles.pageSubtitle}>Fill in the details below</Text>
+                <Text style={styles.pageSubtitle}>Update the details below</Text>
               </View>
             </View>
           </View>
@@ -168,8 +197,8 @@ const CreateJobScreen = ({ navigation }: any) => {
         {/* --- Footer Button --- */}
         <View style={styles.footer}>
           <Button
-            title="Create Job"
-            onPress={handleCreateJob}
+            title="Save Changes" // Changed button text
+            onPress={handleUpdateJob}
             isLoading={isLoading}
           />
         </View>
@@ -305,4 +334,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateJobScreen;
+export default EditJobScreen;
