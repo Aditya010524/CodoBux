@@ -1,58 +1,53 @@
-CodoBux – Offline-First Contractor Job App
+# 🚧 CodoBux – Offline-First Contractor Job App
 
-This repository contains a React Native (CLI) mobile application built as part of a technical assessment.
-The primary focus of this project is offline-first behaviour, data integrity, and clear architectural reasoning, rather than UI polish.
+CodoBux is a **React Native (CLI)** mobile application built as part of a technical assessment.  
+The primary goal of this project is to demonstrate **offline-first architecture**, **data integrity**, and **robust handling of network instability**, rather than UI polish.
 
-🚀 Android Setup Instructions
+---
 
-This project is tested primarily on Android.
+## 📱 Project Overview
 
-Prerequisites
+CodoBux allows contractors to manage jobs reliably, even when the device is offline.
 
-Node.js (LTS recommended)
+Key capabilities:
+- User authentication (Signup & Login)
+- Create and view contractor jobs
+- Full offline support with local persistence
+- No data loss during network changes or app restarts
 
-Android Studio (with Android SDK & Emulator)
+The app is designed to handle:
+- Offline → Online transitions
+- Online → Offline transitions
+- App restarts during offline usage
+- Partial or failed API responses
 
-Java 17 (recommended for React Native CLI)
+---
 
-React Native CLI environment properly set up
+## 🚀 Android Setup Instructions
 
-Steps to Run
+> **Note:** This project is tested primarily on **Android**.
+
+### Prerequisites
+- Node.js (LTS recommended)
+- Android Studio (Android SDK & Emulator)
+- Java 17
+- React Native CLI environment properly configured
+
+### Run the App
+
+```bash
 git clone https://github.com/Aditya010524/CodoBux.git
 cd CodoBux
-npm install
-npx react-native run-android
 
-
-If you face any environment issues, an APK build is also provided (link shared separately) for quick testing.
-
-📱 Project Overview
-
-CodoBux is an offline-first contractor job management app that allows users to:
-
-Sign up and log in
-
-Create and view contractor jobs
-
-Continue working even when the device is offline
-
-Persist job data locally with no data loss
-
-The app is designed to behave reliably under:
-
-Network loss
-
-App restarts
-
-Offline → Online transitions
+If you face any environment or setup issues, an APK build is also provided (shared separately) so the app can be tested without running the project locally.
 
 🧱 App Architecture
 
 React Native CLI (Bare Workflow)
-Chosen for better control over native modules and production readiness.
+Chosen for better control over native behaviour and production-level flexibility.
 
 Zustand
-Used for simple, predictable global state management.
+Used for lightweight, predictable global state management with minimal boilerplate.
 
 Service Layer
 API calls and business logic are separated from UI components.
@@ -60,13 +55,13 @@ API calls and business logic are separated from UI components.
 Storage Layer
 AsyncStorage is used for offline persistence.
 
-This layered approach keeps the codebase clean, scalable, and easy to reason about.
+This layered architecture keeps the codebase clean, scalable, and easy to reason about.
 
 🔐 Authentication
 
 Supports Signup and Login
 
-Backend returns a token on success
+Backend returns a token on successful authentication
 
 Token is stored securely using AsyncStorage
 
@@ -88,11 +83,11 @@ Why AsyncStorage?
 
 Simple and stable
 
-Easy to implement within limited time
+Quick to implement within limited time
 
-Sufficient for small-to-medium datasets
+Suitable for small-to-medium datasets
 
-In a production environment, this would be migrated to MMKV for better performance.
+In a production system, this would be migrated to MMKV for faster reads/writes and better performance.
 
 📦 Offline-First Job Handling
 What Works Offline
@@ -115,11 +110,12 @@ Jobs are marked as locally stored (pending sync)
 
 Sync Behaviour
 
-Sync is designed to happen automatically when internet is restored
+Sync is designed to happen automatically when the internet connection is restored
 
 No manual “Sync” button is used
 
-Due to backend API issues (internal server errors during development), full online CRUD and sync could not be demonstrated, but the offline-first flow is fully implemented.
+Due to backend API issues (internal server errors during development), full online CRUD and sync could not be demonstrated.
+However, the offline-first data flow and persistence logic are fully implemented.
 
 📝 Notes & 🎥 Video
 Notes
@@ -132,13 +128,13 @@ Video
 
 Video upload was not implemented
 
-Architecture is prepared for future support
+Architecture allows future support without major refactoring
 
 🌐 Handling Offline Scenarios
 
 Local-first data access
 
-Zustand manages app state cleanly
+Zustand manages application state cleanly
 
 App continues working during:
 
@@ -229,3 +225,5 @@ Data consistency
 Clear reasoning and architecture
 
 UI polish and advanced optimisations were intentionally kept secondary.
+npm install
+npx react-native run-android
