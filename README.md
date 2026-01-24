@@ -224,5 +224,11 @@ Data consistency
 Clear reasoning and architecture
 
 UI polish and advanced optimisations were intentionally kept secondary.
+
+### Run the App
+
+```bash
+git clone https://github.com/Aditya010524/CodoBux.git
+cd CodoBux
 npm install
 npx react-native run-android
