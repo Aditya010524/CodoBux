@@ -35,7 +35,6 @@ The app is designed to handle:
 
 ### Run the App
 
-```bash
 git clone https://github.com/Aditya010524/CodoBux.git
 cd CodoBux
 
