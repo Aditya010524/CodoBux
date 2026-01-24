@@ -33,10 +33,16 @@ The app is designed to handle:
 - Java 17
 - React Native CLI environment properly configured
 
+
 ### Run the App
 
+```bash
 git clone https://github.com/Aditya010524/CodoBux.git
 cd CodoBux
+npm install
+npx react-native run-android
+```
+
 
 If you face any environment or setup issues, an APK build is also provided (shared separately) so the app can be tested without running the project locally.
 
@@ -225,10 +231,4 @@ Clear reasoning and architecture
 
 UI polish and advanced optimisations were intentionally kept secondary.
 
-### Run the App
 
-```bash
-git clone https://github.com/Aditya010524/CodoBux.git
-cd CodoBux
-npm install
-npx react-native run-android
