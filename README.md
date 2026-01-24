@@ -1,97 +1,231 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+CodoBux – Offline-First Contractor Job App
 
-# Getting Started
+This repository contains a React Native (CLI) mobile application built as part of a technical assessment.
+The primary focus of this project is offline-first behaviour, data integrity, and clear architectural reasoning, rather than UI polish.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+🚀 Android Setup Instructions
 
-## Step 1: Start Metro
+This project is tested primarily on Android.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+Prerequisites
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+Node.js (LTS recommended)
 
-```sh
-# Using npm
-npm start
+Android Studio (with Android SDK & Emulator)
 
-# OR using Yarn
-yarn start
-```
+Java 17 (recommended for React Native CLI)
 
-## Step 2: Build and run your app
+React Native CLI environment properly set up
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+Steps to Run
+git clone https://github.com/Aditya010524/CodoBux.git
+cd CodoBux
+npm install
+npx react-native run-android
 
-### Android
 
-```sh
-# Using npm
-npm run android
+If you face any environment issues, an APK build is also provided (link shared separately) for quick testing.
 
-# OR using Yarn
-yarn android
-```
+📱 Project Overview
 
-### iOS
+CodoBux is an offline-first contractor job management app that allows users to:
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+Sign up and log in
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+Create and view contractor jobs
 
-```sh
-bundle install
-```
+Continue working even when the device is offline
 
-Then, and every time you update your native dependencies, run:
+Persist job data locally with no data loss
 
-```sh
-bundle exec pod install
-```
+The app is designed to behave reliably under:
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+Network loss
 
-```sh
-# Using npm
-npm run ios
+App restarts
 
-# OR using Yarn
-yarn ios
-```
+Offline → Online transitions
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+🧱 App Architecture
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+React Native CLI (Bare Workflow)
+Chosen for better control over native modules and production readiness.
 
-## Step 3: Modify your app
+Zustand
+Used for simple, predictable global state management.
 
-Now that you have successfully run the app, let's make changes!
+Service Layer
+API calls and business logic are separated from UI components.
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+Storage Layer
+AsyncStorage is used for offline persistence.
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+This layered approach keeps the codebase clean, scalable, and easy to reason about.
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+🔐 Authentication
 
-## Congratulations! :tada:
+Supports Signup and Login
 
-You've successfully run and modified your React Native App. :partying_face:
+Backend returns a token on success
 
-### Now what?
+Token is stored securely using AsyncStorage
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+Token is automatically attached to all API requests
 
-# Troubleshooting
+If the backend returns 401 Unauthorized, the user is redirected to login
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+💾 Local Storage Strategy
 
-# Learn More
+AsyncStorage is used to store:
 
-To learn more about React Native, take a look at the following resources:
+Authentication token
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+User profile
+
+Job data created while offline
+
+Why AsyncStorage?
+
+Simple and stable
+
+Easy to implement within limited time
+
+Sufficient for small-to-medium datasets
+
+In a production environment, this would be migrated to MMKV for better performance.
+
+📦 Offline-First Job Handling
+What Works Offline
+
+Creating jobs
+
+Viewing job list
+
+Viewing job details
+
+Behaviour When Offline
+
+Jobs are saved locally
+
+No data loss occurs
+
+UI continues to function normally
+
+Jobs are marked as locally stored (pending sync)
+
+Sync Behaviour
+
+Sync is designed to happen automatically when internet is restored
+
+No manual “Sync” button is used
+
+Due to backend API issues (internal server errors during development), full online CRUD and sync could not be demonstrated, but the offline-first flow is fully implemented.
+
+📝 Notes & 🎥 Video
+Notes
+
+Unlimited notes per job are supported in design
+
+Notes are intended to work offline and sync independently
+
+Video
+
+Video upload was not implemented
+
+Architecture is prepared for future support
+
+🌐 Handling Offline Scenarios
+
+Local-first data access
+
+Zustand manages app state cleanly
+
+App continues working during:
+
+Network loss
+
+App restarts while offline
+
+Clear UI indicators for offline state
+
+⚠️ Failure & Retry Handling
+
+All API calls are wrapped in try/catch
+
+Network errors are handled gracefully
+
+Failed operations do not crash the app
+
+Data remains safely stored locally
+
+Advanced retry strategies (background retries, exponential backoff) are planned for production.
+
+🚧 Known Limitations
+
+Backend API errors prevented full online CRUD testing
+
+Background sync is not implemented
+
+Video upload is not implemented
+
+AsyncStorage is not ideal for very large datasets
+
+Pagination is not implemented for job lists
+
+🔮 Improvements for a Production System
+
+Given more time and a production environment, the following improvements would be implemented:
+
+Storage & Performance
+
+Migrate from AsyncStorage to MMKV for faster reads/writes
+
+State Management
+
+Centralised global network state (isOnline) using Zustand
+
+Sync & Reliability
+
+Background sync using native background tasks
+
+Media Handling
+
+Support multiple video uploads per job
+
+Chunked uploads for large videos and images
+
+Data Fetching
+
+Pagination for job lists
+
+Pull-to-refresh
+
+TanStack Query (React Query) for:
+
+Server state management
+
+Caching
+
+Background refetching
+
+Pagination handling
+
+Architecture
+
+Centralised network layer
+
+Clear separation between offline queue and sync engine
+
+Improved logging and error reporting
+
+📌 Final Note
+
+This project prioritises:
+
+Correct offline behaviour
+
+Data consistency
+
+Clear reasoning and architecture
+
+UI polish and advanced optimisations were intentionally kept secondary.
